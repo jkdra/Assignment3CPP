@@ -55,6 +55,67 @@ void showDVDMenu() {
 }
 
 /*
+ * handleMenuSelection
+ *
+ * Handles the user's menu selection and calls the appropriate search function.
+ *
+ * @param option - Menu selection
+ * @param movieList - Pointer to the head of the movie list
+ * @param outFile - File stream for outputting results
+ */
+void handleMenuSelection(MENU_OPTIONS option, Movie*& movieList, ofstream &outFile) {
+    string searchTerm;    // INPUT - Stores the search term for various options
+    int numericSearch;    // INPUT - Stores numeric search terms for year and rating
+
+    switch (option) {
+        case OUTPUT_LIST:  // Output Entire List
+            cout << "Listing all movies!" << endl;
+            printShortMovieListing(movieList, outFile);
+            break;
+
+        case TITLE_SEARCH:  // Title Search
+            cout << "Which title are you looking for? ";
+            getline(cin, searchTerm);
+            titleSearch(movieList, searchTerm, outFile);
+            break;
+
+        case GENRE_SEARCH:  // Genre Search
+            cout << "Which genre are you looking for? ";
+            getline(cin, searchTerm);
+            genreSearch(movieList, searchTerm, outFile);
+            break;
+
+        case ACTOR_SEARCH:  // Actor Search
+            cout << "Which actor are you looking for? ";
+            getline(cin, searchTerm);
+            actorSearch(movieList, searchTerm, outFile);
+            break;
+
+        case YEAR_SEARCH:  // Year Search
+            cout << "Which year are you looking for? ";
+            cin >> numericSearch;
+            cin.ignore();
+            if (numericSearch < 1878 || numericSearch > 3000) cout << "**** Please input a valid year between 1878 and 3000 ****" << endl;
+            else yearSearch(movieList, numericSearch, outFile);
+            break;
+
+        case RATING_SEARCH:  // Rating Search
+            cout << "Which rating are you looking for? ";
+            cin >> numericSearch;
+            cin.ignore();
+            if (numericSearch < 0 || numericSearch > 9) cout << "**** Please input a valid rating between 0 and 9 ****" << endl;
+            else ratingSearch(movieList, numericSearch, outFile);
+            break;
+
+        case EXIT:  // Exit
+            cout << "Exiting program." << endl;
+            break;
+        default:
+            cout << "**** Invalid option, please try again ****" << endl;
+    }
+}
+
+/*
  * fileSetup - Allow the user to specify an input and output files. Allow the user the option to use a default file.
  * @param inFile - Input file stream
  * @param outFile - Output file stream
@@ -157,25 +218,30 @@ string formatPlot(const string &plot) {
 /*
  * printShortMovieListing
  *
- * print the movie listings to the output file
+ * Prints all movies in the linked list in a short format to the output file.
  *
- * @param movieList
- * @param outFile
+ * @param movieList - Pointer to the head of the linked list of movies
+ * @param outFile - File stream for outputting results
  */
-void printShortMovieListing(Movie* movieList, fstream &outFile, const int numMovies) {
+void printShortMovieListing(Movie* movieList, ofstream &outFile) {
     outFile
     << "MOVIE #  TITLE                                           YEAR RATING  GENRE             ALT GENRE         LEAD ACTOR          SUPPORTING ACTOR\n"
     << "------- ------------------------------------------------ ---- ------ ----------------- ----------------- ------------------- -------------------\n";
-    for (int i = 0; i < numMovies; ++i) {
+
+    int movieCount = 1; // COUNTER - Keeps track of the movie number
+
+    // Traverse and output each movie in the list
+    while (movieList != nullptr) {
         outFile
-        << internal << setw(4) << i + 1 << "  "
-        << left << setw(40) << movieList -> title << "  "
-        << setw(4) << movieList -> year << "  " << internal << setw(5) << movieList -> rating << "  "
-        << left << setw(20) << movieList -> genre << "  " << setw(20) << movieList -> altGenre << "  " << setw(36) << movieList -> lead << "  " << setw(36) << movieList -> supporting << "\n";
-        movieList = movieList -> next;
+        << internal << setw(4) << movieCount++ << "  "
+        << left << setw(40) << movieList->title << "  "
+        << setw(4) << movieList->year << "  " << internal << setw(5) << movieList->rating << "  "
+        << left << setw(20) << movieList->genre << "  " << setw(20) << movieList->altGenre << "  "
+        << setw(36) << movieList->lead << "  " << setw(36) << movieList->supporting << "\n";
+
+        movieList = movieList->next; // Move to the next node
     }
 }
-
 /*
  * printLongMovieListing
  *
@@ -184,7 +250,7 @@ void printShortMovieListing(Movie* movieList, fstream &outFile, const int numMov
  * @param movieList
  * @param outFile
  */
-void printLongMovieListing(Movie* movieList, fstream &outFile) {
+void printLongMovieListing(Movie* movieList, ofstream &outFile) {
     outFile
     << "\n\n***************************************************************************\n"
     << "Title:  " << movieList -> title << "\n"
@@ -208,7 +274,7 @@ void printLongMovieListing(Movie* movieList, fstream &outFile) {
  * @param title
  * @return
  */
-void titleSearch(Movie* head, const string& title, fstream &outFile) {
+void titleSearch(Movie* head, const string& title, ofstream &outFile) {
     Movie* current = head;
     bool found = false;     // FLAG - Tracks if the movie is found
 
@@ -223,4 +289,125 @@ void titleSearch(Movie* head, const string& title, fstream &outFile) {
     }
 
     if (!found) cout << "Movie titled '" << title << "' not found.\n";
+    else cout << "Movie titled '" << title << "' found.\n";
+}
+
+/*
+ * genreSearch
+ *
+ * Searches the linked list for movies with the specified genre and outputs each matching movie.
+ *
+ * @param head - Pointer to the head of the movie list
+ * @param genre - Genre to search for
+ * @param outFile - File stream for outputting results
+ */
+void genreSearch(Movie* head, const string& genre, ofstream &outFile) {
+    Movie* current = head;
+    bool found = false;     // FLAG - Tracks if any movie is found
+
+    // Output header if any matches are found
+    outFile << "Movies with genre '" << genre << "':\n";
+
+    while (current != nullptr) {
+        if (current -> genre == genre || current -> altGenre == genre) {
+            // OUTPUT - Call user's function to output movie details in short format
+            printShortMovieListing(current, outFile);
+            found = true;
+            break; // Output header only once if matches are found
+        }
+        current = current -> next;
+    }
+
+    if (!found) cout << "No movies found with genre '" << genre << "'.\n";
+    else cout << "Movies with genre '" << genre << "' have been listed.\n";
+}
+
+/*
+ * actorSearch
+ *
+ * Searches the linked list for movies with the specified actor and outputs each matching movie.
+ *
+ * @param head - Pointer to the head of the movie list
+ * @param actor - Actor to search for
+ * @param outFile - File stream for outputting results
+ */
+void actorSearch(Movie* head, const string& actor, ofstream &outFile) {
+    Movie* current = head;
+    bool found = false;     // FLAG - Tracks if any movie is found
+
+    // Output header if any matches are found
+    outFile << "Movies with actor '" << actor << "':\n";
+
+    while (current != nullptr) {
+        if (current -> lead == actor || current -> supporting == actor) {
+            // OUTPUT - Call user's function to output movie details in short format
+            printShortMovieListing(current, outFile);
+            found = true;
+            break; // Output header only once if matches are found
+        }
+        current = current -> next;
+    }
+
+    if (!found) cout << "No movies found with actor '" << actor << "'.\n";
+    else cout << "Movies with actor '" << actor << "' have been listed.\n";
+}
+
+/*
+ * yearSearch
+ *
+ * Searches the linked list for movies with the specified year and outputs each matching movie.
+ *
+ * @param head - Pointer to the head of the movie list
+ * @param year - Year to search for
+ * @param outFile - File stream for outputting results
+ */
+void yearSearch(Movie* head, const int year, ofstream &outFile) {
+    Movie* current = head;
+    bool found = false;     // FLAG - Tracks if any movie is found
+
+    // Output header if any matches are found
+    outFile << "Movies with year " << year << ":\n";
+
+    while (current != nullptr) {
+        if (current -> year == year) {
+            // OUTPUT - Call user's function to output movie details in short format
+            printShortMovieListing(current, outFile);
+            found = true;
+            break; // Output header only once if matches are found
+        }
+        current = current -> next;
+    }
+
+    if (!found) cout << "No movies found with year " << year << ".\n";
+    else cout << "Movies with year " << year << " have been listed.\n";
+}
+
+/*
+ * ratingSearch
+ *
+ * Searches the linked list for movies with the specified rating and outputs each matching movie.
+ *
+ * @param head - Pointer to the head of the movie list
+ * @param rating - Rating to search for
+ * @param outFile - File stream for outputting results
+ */
+void ratingSearch(Movie* head, int rating, ofstream &outFile) {
+    Movie* current = head;
+    bool found = false;     // FLAG - Tracks if any movie is found
+
+    // Output header if any matches are found
+    outFile << "Movies with rating " << rating << ":\n";
+
+    while (current != nullptr) {
+        if (current -> rating == rating) {
+            // OUTPUT - Call user's function to output movie details in short format
+            printShortMovieListing(current, outFile);
+            found = true;
+            break; // Output header only once if matches are found
+        }
+        current = current -> next;
+    }
+
+    if (!found) cout << "No movies found with rating " << rating << ".\n";
+    else cout << "Movies with rating " << rating << " have been listed.\n";
 }

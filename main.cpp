@@ -19,52 +19,28 @@ using namespace std;
 
 // main
 int main() {
-
-    Movie* movieList = nullptr;       // OUTPUT - Pointer to the head of the movie list
-    MENU_OPTIONS menuSelection;       // INPUT - Menu Selection
-    string title;            // INPUT - Title of the movie
-    string genre;            // INPUT - Genre of the movie
-    string actor;            // INPUT - Actor of the movie
-    int year;                // INPUT - Year of the movie
-    float rating;            // INPUT - Rating of the movie
-
-    // Print the heading of the lab
-    printHeadingConsole();
-
-    // Initialize the input and output files
     ofstream outFile;
+    Movie* movieList = nullptr; // HEAD - Pointer to the linked list head
+    int menuOptionInput;        // INPUT - Stores the user's menu choice
+
+    // Setup input and output files, and populate the linked list
     fileSetup(outFile, movieList);
 
-
     do {
-        // Show the menu
-        showDVDMenu();
-        // Get the menu selection
-        // Invalid Input Check
-        if (cin.fail()) {
-            cerr << "\nPlease input a number between 0 and 6\n";
-            cin.clear();
-            cin.ignore();
-            continue;
-        }
-        // Clear the input buffer
-        cin.clear();
-        cin.ignore();
-        switch (menuSelection) {
-            default:
-                cout
-                << "\n**** The number " << menuSelection << " is an invalid entry      ****\n"
-                << "**** Please input a number between 0 and 6 ****\n";
-                break;
-            case 0:
-                // Don't do anything, the loop will recognize 0 already and exit successfully.
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-        }
-    } while (menuSelection != 0);
+        showDVDMenu();  // Show the menu
+        cin >> menuOptionInput;
+        cin.ignore();  // Clear newline left in the input buffer
+
+        // Convert integer input to enum type for safety and clarity
+        MENU_OPTIONS menuOption = static_cast<MENU_OPTIONS>(menuOptionInput);
+
+        // Handle menu selection
+        handleMenuSelection(menuOption, movieList, outFile);
+
+    } while (menuOptionInput != EXIT);  // Loop until user enters EXIT (0)
+
+    // Cleanup
+    outFile.close();
 
     return 0;
 }

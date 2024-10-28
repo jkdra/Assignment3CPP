@@ -6,3 +6,6 @@
  * DUE DATE : Oct. 28, 2024
 
 
+MOVIE #  TITLE                                           YEAR RATING  GENRE             ALT GENRE         LEAD ACTOR          SUPPORTING ACTOR
+------- ------------------------------------------------ ---- ------ ----------------- ----------------- ------------------- -------------------
+   1  Zodiac                                   2007      8  Drama                Crime                Jake Gyllenhaal                      Mark Ruffalo                       

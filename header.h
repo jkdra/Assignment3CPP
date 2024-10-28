@@ -21,7 +21,7 @@ struct Movie {
     string genre;
     string altGenre;
     int year;
-    float rating;
+    int rating;
     string plot;
     Movie* next;
 };
@@ -56,6 +56,8 @@ void printHeadingFile(ofstream &outFile);
  */
 void showDVDMenu();
 
+void handleMenuSelection(MENU_OPTIONS option, Movie*& movieList, ofstream &outFile); // Handles menu choices
+
 /*
  * fileSetup
  *
@@ -87,8 +89,8 @@ string formatPlot(const string &plot);
  * @param movieList
  * @param outFile
  */
-void printShortMovieListing(Movie* movieList, fstream &outFile);
-void printLongMovieListing(Movie* movieList, fstream &outFile);
+void printShortMovieListing(Movie* movieList, ofstream &outFile);
+void printLongMovieListing(Movie* movieList, ofstream &outFile);
 
 /*
  * titleSearch
@@ -99,7 +101,7 @@ void printLongMovieListing(Movie* movieList, fstream &outFile);
  * @param title
  * @return
  */
-void titleSearch(Movie* head, const string& title, fstream &outFile);
+void titleSearch(Movie* head, const string& title, ofstream &outFile);
 
 /*
  * genreSearch
@@ -110,7 +112,7 @@ void titleSearch(Movie* head, const string& title, fstream &outFile);
  * @param genre
  * @return
  */
-void genreSearch(Movie* head, const string& genre, fstream &outFile);
+void genreSearch(Movie* head, const string& genre, ofstream &outFile);
 
 /*
  * actorSearch
@@ -121,7 +123,7 @@ void genreSearch(Movie* head, const string& genre, fstream &outFile);
  * @param actor
  * @return
  */
-void actorSearch(Movie* head, const string& actor, fstream &outFile);
+void actorSearch(Movie* head, const string& actor, ofstream &outFile);
 
 /*
  * yearSearch
@@ -132,7 +134,7 @@ void actorSearch(Movie* head, const string& actor, fstream &outFile);
  * @param year
  * @return
  */
-void yearSearch(Movie* head, const int year, fstream &outFile);
+void yearSearch(Movie* head, int year, ofstream &outFile);
 
 /*
  * ratingSearch
@@ -143,7 +145,7 @@ void yearSearch(Movie* head, const int year, fstream &outFile);
  * @param rating
  * @return
  */
-void ratingSearch(Movie* head, const float rating, fstream &outFile);
+void ratingSearch(Movie* head, int rating, ofstream &outFile);
 
 
 #endif //HEADER_H
