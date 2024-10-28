@@ -1,0 +1,8 @@
+ * AUTHOR : Jawad Khadra
+ * STUDENT ID : 1312092 (IVC)
+ * Assignment #3 - DVD
+ * CLASS : CS1B
+ * SECTION : MW: 7:30p - 9:50p
+ * DUE DATE : Oct. 28, 2024
+
+
