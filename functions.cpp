@@ -17,7 +17,7 @@ void printHeadingConsole() {
     << " * Assignment #3 - DVD\n"
     << " * CLASS : CS1B\n"
     << " * SECTION : MW: 7:30p - 9:50p\n"
-    << " * DUE DATE : Oct. 28, 2024\n\n"
+    << " * DUE DATE : Oct. 28, 2024\n"
     << endl;
 }
 
@@ -33,7 +33,7 @@ void printHeadingFile(ofstream &outFile) {
     << " * Assignment #3 - DVD\n"
     << " * CLASS : CS1B\n"
     << " * SECTION : MW: 7:30p - 9:50p\n"
-    << " * DUE DATE : Oct. 28, 2024\n\n"
+    << " * DUE DATE : Oct. 28, 2024\n"
     << endl;
 }
 
@@ -43,7 +43,7 @@ void printHeadingFile(ofstream &outFile) {
  */
 void showDVDMenu() {
     cout
-    << "\n\nDVD MENU:\n"
+    << "\nDVD MENU:\n"
     << "1 – Output Entire List\n"
     << "2 - Title Search\n"
     << "3 - Genre Search\n"
@@ -70,6 +70,8 @@ void handleMenuSelection(MENU_OPTIONS option, Movie*& movieList, ofstream &outFi
     switch (option) {
         case OUTPUT_LIST:  // Output Entire List
             cout << "Listing all movies!" << endl;
+
+            outFile << "\nCOMPLETE MOVIE LISTING:\n";
             printShortMovieListing(movieList, outFile);
             break;
 
@@ -103,7 +105,11 @@ void handleMenuSelection(MENU_OPTIONS option, Movie*& movieList, ofstream &outFi
             cout << "Which rating are you looking for? ";
             cin >> numericSearch;
             cin.ignore();
-            if (numericSearch < 0 || numericSearch > 9) cout << "**** Please input a valid rating between 0 and 9 ****" << endl;
+            if (numericSearch < 0 || numericSearch > 9) {
+                cout
+                << "**** The number " << numericSearch << " is an invalid entry. ****\n"
+                << "**** Please input a valid rating between 0 and 9 ****" << endl;
+            }
             else ratingSearch(movieList, numericSearch, outFile);
             break;
 
@@ -154,26 +160,32 @@ void fileSetup(ofstream &outFile, Movie *&movieList) {
 
     // Take the movies from the input file and put them into a linked list
     while (true) {
-        Movie* newMovie = new Movie;
+        Movie* newMovie = new Movie;  // Allocate new memory for each movie node
 
         // INPUT - Read movie details from file and check for input failure
-        if (!getline(inFile, newMovie -> title) ||
-            !getline(inFile, newMovie -> lead) ||
-            !getline(inFile, newMovie -> supporting) ||
-            !getline(inFile, newMovie -> genre) ||
-            !getline(inFile, newMovie -> altGenre) ||
-            !(inFile >> newMovie -> year) ||
-            !(inFile >> newMovie -> rating)) {
+        if (!getline(inFile, newMovie->title) ||
+            !getline(inFile, newMovie->lead) ||
+            !getline(inFile, newMovie->supporting) ||
+            !getline(inFile, newMovie->genre) ||
+            !getline(inFile, newMovie->altGenre) ||
+            !(inFile >> newMovie->year) ||
+            !(inFile >> newMovie->rating)) {
             delete newMovie;  // Free memory if read fails at any point
             break;            // Exit loop on read failure or end of data
-        }
+            }
 
         inFile.ignore();  // Ignore the newline character after rating
         getline(inFile, newMovie->plot);  // Read the plot description
 
+        // Skip the blank line separating movies, if present
+        inFile.ignore(numeric_limits<streamsize>::max(), '\n');
+
         // LINKING - Insert new movie at the beginning of the list
-        newMovie -> next = movieList;
+        newMovie->next = movieList;
         movieList = newMovie;
+
+        // Check if end of file reached after complete entry
+        if (inFile.eof()) break;
     }
 
     // Close the input file
@@ -188,7 +200,7 @@ void fileSetup(ofstream &outFile, Movie *&movieList) {
  * @param plot - Plot of the movie
  * @return string - Formatted plot
  */
-string formatPlot(const string &plot) {
+string formatPlot(string &plot) {
     stringstream formattedPlot;   // OUTPUT - Formatted plot
     string word;                  // INPUT - Current word
     int lineLength = 0;           // CALC - Length of the current line
@@ -218,47 +230,53 @@ string formatPlot(const string &plot) {
 /*
  * printShortMovieListing
  *
- * Prints all movies in the linked list in a short format to the output file.
+ * Prints the movies in a listed format to the output file.
  *
  * @param movieList - Pointer to the head of the linked list of movies
  * @param outFile - File stream for outputting results
  */
 void printShortMovieListing(Movie* movieList, ofstream &outFile) {
+
     outFile
-    << "MOVIE #  TITLE                                           YEAR RATING  GENRE             ALT GENRE         LEAD ACTOR          SUPPORTING ACTOR\n"
-    << "------- ------------------------------------------------ ---- ------ ----------------- ----------------- ------------------- -------------------\n";
+    << "MOVIE # TITLE                                          YEAR RATING GENRE             ALT GENRE         LEAD ACTOR          SUPPORTING ACTOR\n"
+    << "------- ---------------------------------------------- ---- ------ ----------------- ----------------- ------------------- -------------------\n";
 
     int movieCount = 1; // COUNTER - Keeps track of the movie number
 
     // Traverse and output each movie in the list
     while (movieList != nullptr) {
         outFile
-        << internal << setw(4) << movieCount++ << "  "
-        << left << setw(40) << movieList->title << "  "
-        << setw(4) << movieList->year << "  " << internal << setw(5) << movieList->rating << "  "
-        << left << setw(20) << movieList->genre << "  " << setw(20) << movieList->altGenre << "  "
-        << setw(36) << movieList->lead << "  " << setw(36) << movieList->supporting << "\n";
+        << right << setw(5) << movieCount++ << "   "
+        << left << setw(46) << movieList -> title << " "
+        << setw(4) << movieList -> year << " "
+        << right << setw(4) << movieList -> rating << "   "
+        << left << setw(17) << movieList -> genre << " "
+        << setw(17) << movieList -> altGenre << " "
+        << setw(19) << movieList -> lead << " "
+        << setw(19) << movieList -> supporting << "\n";
 
-        movieList = movieList->next; // Move to the next node
+        movieList = movieList -> next; // Move to the next node
     }
 }
+
 /*
  * printLongMovieListing
  *
- * print the movie listings to the output file
+ * print a detailed version of the movie listing to the output file
  *
  * @param movieList
  * @param outFile
  */
 void printLongMovieListing(Movie* movieList, ofstream &outFile) {
+
     outFile
     << "\n\n***************************************************************************\n"
-    << "Title:  " << movieList -> title << "\n"
+    << "Title: " << movieList -> title << "\n"
     << "---------------------------------------------------------------------------\n"
-    << "Year:   " << movieList -> year << "\t" << "Rating: " << movieList -> rating << "\n"
+    << "Year: " << movieList -> year << "\t\t  " << "Rating: " << movieList -> rating << "\n"
     << "---------------------------------------------------------------------------\n"
-    << "Leading Actor:  " << left << setw(36) << movieList -> lead << "Genre 1:  " << movieList -> genre << "\n"
-    << "Supporting Actor: " << movieList -> supporting << " Genre 2: " << movieList -> altGenre << "\n"
+    << left << setw(18) << "Leading Actor:" << setw(32) << movieList -> lead << "Genre 1: " << movieList -> genre << "\n"
+    << left << setw(18) << "Supporting Actor:" << setw(32) << movieList -> supporting << "Genre 2: " << movieList -> altGenre << "\n"
     << "---------------------------------------------------------------------------\n"
     << "PLOT:\n" << formatPlot(movieList -> plot) << "\n"
     << "***************************************************************************\n"
@@ -278,18 +296,20 @@ void titleSearch(Movie* head, const string& title, ofstream &outFile) {
     Movie* current = head;
     bool found = false;     // FLAG - Tracks if the movie is found
 
+    cout << "Searching for the title " << title << "\n";
     while (current != nullptr) {
-        if (current->title == title) {
+        if (current -> title == title) {
+
             // OUTPUT - Call user's function to output full movie details
             printLongMovieListing(current, outFile);
             found = true;
             break;
         }
-        current = current->next;
+        current = current -> next;
     }
 
-    if (!found) cout << "Movie titled '" << title << "' not found.\n";
-    else cout << "Movie titled '" << title << "' found.\n";
+    if (found) cout << "Found the movie " << title << "!\n";
+    else cout << "Movie titled \"" << title << "\" not found.\n";
 }
 
 /*
@@ -302,24 +322,26 @@ void titleSearch(Movie* head, const string& title, ofstream &outFile) {
  * @param outFile - File stream for outputting results
  */
 void genreSearch(Movie* head, const string& genre, ofstream &outFile) {
-    Movie* current = head;
-    bool found = false;     // FLAG - Tracks if any movie is found
+    Movie* current = head;  // INPUT - The current movie that's being pointed to
+    int count = 0;          // COUNTER - Keeps track of the number of movies found
+
+    cout << "Searching for the genre " << genre << "\n";
 
     // Output header if any matches are found
-    outFile << "Movies with genre '" << genre << "':\n";
+    outFile << "\nSearch by genre for " << genre << " found:\n";
 
     while (current != nullptr) {
         if (current -> genre == genre || current -> altGenre == genre) {
             // OUTPUT - Call user's function to output movie details in short format
             printShortMovieListing(current, outFile);
-            found = true;
+            count++;
             break; // Output header only once if matches are found
         }
         current = current -> next;
     }
 
-    if (!found) cout << "No movies found with genre '" << genre << "'.\n";
-    else cout << "Movies with genre '" << genre << "' have been listed.\n";
+    if (count == 0) cout << "Sorry, no movies for the genre, " << genre << " werefound.\n";
+    else cout << "Found " << count << " movies for the genre " << genre << "!\n";
 }
 
 /*
@@ -333,23 +355,25 @@ void genreSearch(Movie* head, const string& genre, ofstream &outFile) {
  */
 void actorSearch(Movie* head, const string& actor, ofstream &outFile) {
     Movie* current = head;
-    bool found = false;     // FLAG - Tracks if any movie is found
+    int count = 0;          // COUNTER & FLAG - Keeps track of the number of movies found
+
+    cout << "Searching for the actor " << actor << "\n";
 
     // Output header if any matches are found
-    outFile << "Movies with actor '" << actor << "':\n";
+    outFile << "\nSearch by actor for " << actor << " found:\n";
 
     while (current != nullptr) {
         if (current -> lead == actor || current -> supporting == actor) {
             // OUTPUT - Call user's function to output movie details in short format
             printShortMovieListing(current, outFile);
-            found = true;
+            count++;
             break; // Output header only once if matches are found
         }
         current = current -> next;
     }
 
-    if (!found) cout << "No movies found with actor '" << actor << "'.\n";
-    else cout << "Movies with actor '" << actor << "' have been listed.\n";
+    if (count == 0) cout << "Sorry, no movies for the actor, " << actor << " were found.\n";
+    else cout << "Found " << count << " movies for the actor " << actor << "!\n";
 }
 
 /*
@@ -363,23 +387,22 @@ void actorSearch(Movie* head, const string& actor, ofstream &outFile) {
  */
 void yearSearch(Movie* head, const int year, ofstream &outFile) {
     Movie* current = head;
-    bool found = false;     // FLAG - Tracks if any movie is found
+    int count = 0;          // COUNTER & FLAG - Keeps track of the number of movies found
 
     // Output header if any matches are found
-    outFile << "Movies with year " << year << ":\n";
+    outFile << "\nSearch by year for " << year << " found:\n";
 
     while (current != nullptr) {
         if (current -> year == year) {
             // OUTPUT - Call user's function to output movie details in short format
             printShortMovieListing(current, outFile);
-            found = true;
+            count++;
             break; // Output header only once if matches are found
         }
         current = current -> next;
     }
-
-    if (!found) cout << "No movies found with year " << year << ".\n";
-    else cout << "Movies with year " << year << " have been listed.\n";
+    if (count == 0) cout << "Sorry, no movies for the year, " << year << " were found.\n";
+    else cout << "Found " << count << " movies for the year " << year << "!\n";
 }
 
 /*
@@ -393,21 +416,21 @@ void yearSearch(Movie* head, const int year, ofstream &outFile) {
  */
 void ratingSearch(Movie* head, int rating, ofstream &outFile) {
     Movie* current = head;
-    bool found = false;     // FLAG - Tracks if any movie is found
+    int count = 0;          // COUNTER & FLAG - Keeps track of the number of movies found
 
     // Output header if any matches are found
-    outFile << "Movies with rating " << rating << ":\n";
+    outFile << "\nSearch by rating for " << rating << " found:\n";
 
     while (current != nullptr) {
         if (current -> rating == rating) {
             // OUTPUT - Call user's function to output movie details in short format
             printShortMovieListing(current, outFile);
-            found = true;
+            count++;
             break; // Output header only once if matches are found
         }
         current = current -> next;
     }
 
-    if (!found) cout << "No movies found with rating " << rating << ".\n";
-    else cout << "Movies with rating " << rating << " have been listed.\n";
+    if (count == 0) cout << "Sorry, no movies for the rating, " << rating << " were found.\n";
+    else cout << "Found " << count << " movies for the rating " << rating << "!\n";
 }

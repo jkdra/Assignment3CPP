@@ -23,6 +23,8 @@ int main() {
     Movie* movieList = nullptr; // HEAD - Pointer to the linked list head
     int menuOptionInput;        // INPUT - Stores the user's menu choice
 
+    printHeadingConsole();
+
     // Setup input and output files, and populate the linked list
     fileSetup(outFile, movieList);
 
