@@ -89,8 +89,18 @@ string formatPlot(const string &plot);
  * @param movieList
  * @param outFile
  */
-void printShortMovieListing(Movie* movieList, ofstream &outFile);
+void printShortMovieListing(const Movie* movieList, ofstream &outFile, int movieCount);
 void printLongMovieListing(Movie* movieList, ofstream &outFile);
+
+/*
+ * outputEntireList
+ *
+ * Traverses and outputs all movies in the list using the short listing format.
+ *
+ * @param head - Pointer to the head of the movie list (will not be modified)
+ * @param outFile - File stream for outputting results
+ */
+void outputEntireList(Movie* head, ofstream &outFile);
 
 /*
  * titleSearch

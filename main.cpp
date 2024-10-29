@@ -31,7 +31,9 @@ int main() {
     do {
         showDVDMenu();  // Show the menu
         cin >> menuOptionInput;
+        cin.clear();  // Clear newline left in the input buffer
         cin.ignore();  // Clear newline left in the input buffer
+
 
         // Convert integer input to enum type for safety and clarity
         MENU_OPTIONS menuOption = static_cast<MENU_OPTIONS>(menuOptionInput);
@@ -43,6 +45,5 @@ int main() {
 
     // Cleanup
     outFile.close();
-
     return 0;
 }
