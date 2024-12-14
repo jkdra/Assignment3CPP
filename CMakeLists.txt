@@ -5,4 +5,8 @@ set(CMAKE_CXX_STANDARD 26)
 
 add_executable(Assignment3 main.cpp
         header.h
-        functions.cpp)
+        functions.cpp
+        StackListHeader.h
+        MovieListHeader.h
+        MovieListFunc.cpp
+        StackListFunc.cpp)

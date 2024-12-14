@@ -1,10 +1,10 @@
 /*
 * AUTHOR : Jawad Khadra
  * STUDENT ID : 1312092 (IVC)
- * ASSIGNMENT #3
+ * ASSIGNMENT #5 - DVD Movie List (Intro to OOP)
  * CLASS : CS1B
  * SECTION : MW: 7:30p - 9:50p
- * DUE DATE : Oct. 28, 2024
+ * DUE DATE : Dec. 13, 2024
  */
 
 #include "header.h"
@@ -12,38 +12,30 @@
 using namespace std;
 
 /*
- * Assignment 3: Searching Linked Lists
+ * Assignment 5: Intro to Object-Oriented Programming (DVD Movie List)
  *
- * This program allows the user to track and search their DVDs
+ * This program allows the user to track and search their DVDs through object-oriented programming.
  */
 
 // main
 int main() {
-    ofstream outFile;
-    Movie* movieList = nullptr; // HEAD - Pointer to the linked list head
-    int menuOptionInput;        // INPUT - Stores the user's menu choice
+    MovieList* movieList = new MovieList();  // DATA - Pointer to the linked list head
+    string inputFileName, outputFileName;    // INPUT - Stores the user's input and output file names
 
+
+    // Print the heading of the lab to the console
     printHeadingConsole();
 
     // Setup input and output files, and populate the linked list
-    fileSetup(outFile, movieList);
+    cout << "\nWhich input file would you like to use?\n";
+    getline(cin, inputFileName);
 
-    do {
-        showDVDMenu();  // Show the menu
-        cin >> menuOptionInput;
-        cin.clear();  // Clear newline left in the input buffer
-        cin.ignore();  // Clear newline left in the input buffer
+    cout << "\nWhich output file would you like to use?\n";
+    getline(cin, outputFileName);
+
+    movieList->CreateList(inputFileName);
+    movieList->OutputList(outputFileName);
 
 
-        // Convert integer input to enum type for safety and clarity
-        MENU_OPTIONS menuOption = static_cast<MENU_OPTIONS>(menuOptionInput);
-
-        // Handle menu selection
-        handleMenuSelection(menuOption, movieList, outFile);
-
-    } while (menuOptionInput != EXIT);  // Loop until user enters EXIT (0)
-
-    // Cleanup
-    outFile.close();
     return 0;
 }
